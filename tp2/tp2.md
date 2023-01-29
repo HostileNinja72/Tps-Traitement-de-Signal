@@ -59,7 +59,7 @@ fs (taux d'échantillonnage), Taille, ts (durée d'échantillonnage) et T (vecte
       '''
       
       
- #Synthèse et analyse spectrale d’une gamme de musique
+ # Synthèse et analyse spectrale d’une gamme de musique
  
  • 1 • Initialisation:
 
