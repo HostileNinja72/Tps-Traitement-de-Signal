@@ -58,18 +58,7 @@ ylabel('Amplitudes');
 
 
 
-%N_limite = 2500;
-%S_filtrer = (abs(y));
-%plot(S_filtrer)
 
-%S_filtrer(N_limite) = 0;
-%S_filtrer(end-N_limite+2) = 0;
-%S_filtrer=fftshift(S_filtrer);
-
-
-
-
-%signal_filtrer = ifft(S_filtrer);
 
 
 
