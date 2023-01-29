@@ -72,7 +72,7 @@ Le code tp1.m est un script Matlab qui simule un signal x et son bruit, puis mon
    • 7  •Représentation fréquentielle du signal x bruité:
    La représentation fréquentielle du signal x bruité est obtenue en utilisant la FFT et affichée dans le sixième sous-graphique.
    
-   '''
+    '''
     i = fft(xnoise); 
     plot(fshift,fftshift(2*abs(i)/N),'c')
     grid
