@@ -63,6 +63,30 @@ signal ECG pour obtenir la sortie filtrée. Les résultats de ce filtrage sont a
     '''
     
 # Suppression des interférences des lignes électriques 50Hz
+• 1 • On utilise un filtre Notch pour supprimer la composante de 50Hz , et on visualise le résultat :
+
+    '''
+    pass_haut_ideal = ones(size(ecg));
+    fc = 0.5;
+    indexe_fc = ceil((fc*L)/Fe);
+    pass_haut_ideal(1:indexe_fc)=0;
+    pass_haut_ideal(L-indexe_fc+1:L)=0;
+
+  
+     f=(0:L-1)*(Fe/L);
+     figure (3)
+    plot(f,pass_haut_ideal,'linewidth',1.2);
+ 
+    spectre_x_filtree = pass_haut_ideal .* y ;
+    tmp_x_filre = ifft(spectre_x_filtree,'symmetric');
+
+    plot(t,tmp_x_filre)
+    hold on
+    plot(t,ecg+3)
+    hold on
+    plot(t,ecg-tmp_x_filre+1.5)
+    
+    '''
 
 # Identification de la fréquence cardiaque avec la fonction d’autocorrélation
 
