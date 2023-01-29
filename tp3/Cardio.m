@@ -2,47 +2,187 @@ clear all
 close all
 clc
 
-load("ecg.mat");
-L=length(ecg);
-Fe=500;
-t = (0:L-1)/Fe; 
-figure (1)
-plot(t,ecg);
-title('Représentation temporelle du signal x s(t)')
-xlabel('Temps'); 
-label('Amplitudes'); 
-y = fft(ecg);
-fshift = (-L/2:L/2-1)*(Fe/L);
-figure (2)
-spectre_x=fftshift(2*abs(y)/L);
-plot(fshift,fftshift(2*abs(y)/L));
-title('Représentation frequentielle du signal')
-xlabel('Frequencies'); 
-ylabel('Amplitudes');
 
-pass_haut_ideal = ones(size(ecg));
+%Declaration des variable
+load('ecg.mat');
+fe = 500;
+N = length(ecg);
+t = (0:N-1)*1/fe;
+f=(0:N-1)*(fe/N);
 fc = 0.5;
-indexe_fc = ceil((fc*L)/Fe);
-pass_haut_ideal(1:indexe_fc)=0;
-pass_haut_ideal(L-indexe_fc+1:L)=0;
+fc0 = 50;
+fc1=40;
 
+%[0.5;1.5] la taille d une periode
+%%
+%tarnsformer de fourier rapide 
+y = fft(ecg);
+fshift = (-N/2:N/2-1)*(fe/N);
 
-f=(0:L-1)*(Fe/L);
-figure (3)
-plot(f,pass_haut_ideal,'linewidth',1.2);
+%filtrage
+
+   %creation du filtre pass haut
+filtre_pass_Haut = ones(size(ecg));
+index_fc = ceil((fc*N)/fe);
+filtre_pass_Haut(1:index_fc) = 0;
+filtre_pass_Haut(N-index_fc+1:N) = 0;
+
+    %filtrage 
+ecg_filtre_freq = filtre_pass_Haut .*y;
+
+    %restitution du signal filtrer
+ ecg_filtre_temp = ifft(ecg_filtre_freq,"symmetric");  
  
-spectre_x_filtree = pass_haut_ideal .* y ;
-tmp_x_filre = ifft(spectre_x_filtree,'symmetric');
-
-plot(t,tmp_x_filre)
-hold on
-plot(t,ecg+3)
-hold on
-plot(t,ecg-tmp_x_filre+1.5)
-
-
+       %le bruit de bass frequence
+ bruit= ecg-ecg_filtre_temp;
  
-fshift=(-L/2:L/2-1)*(Fe/L);
-% % 
-figure(4)
-plot(fshift,fftshift(abs(fft(tmp_x_filre))));
+%% 
+ %filtrage du bruit d'interferance
+ 
+    %creation du filtre
+    filtre_interferance = ones(size(ecg));
+    index_fc0 = ceil((fc0*N)/fe)+1;
+    filtre_interferance(index_fc0)=0;
+    filtre_interferance(N-index_fc0+1)=0;
+    
+    %application du filtre
+    ecg_filtre_int_freq = filtre_interferance .*fft(ecg_filtre_temp);
+ 
+    %restitution du signal filtrer
+    ecg_filtre_int_temp = ifft(ecg_filtre_int_freq,"symmetric");  
+    
+    bruit_inter = ecg_filtre_temp-ecg_filtre_int_temp; 
+ 
+ 
+%%
+%tarnsformer de fourier rapide 
+y = fft(ecg);
+fshift = (-N/2:N/2-1)*(fe/N);
+
+%filtrage
+
+   %creation du filtre pass haut
+filtre_pass_Haut = ones(size(ecg));
+index_fc = ceil((fc*N)/fe);
+filtre_pass_Haut(1:index_fc) = 0;
+filtre_pass_Haut(N-index_fc+1:N) = 0;
+
+    %filtrage 
+ecg_filtre_freq = filtre_pass_Haut .*y;
+
+    %restitution du signal filtrer
+ ecg_filtre_temp = ifft(ecg_filtre_freq,"symmetric");  
+ 
+       %le bruit de bass frequence
+ bruit= ecg-ecg_filtre_temp;
+ 
+%% 
+ %filtrage du bruit haute frequence
+ 
+    %creation du filtre pass bas
+    filtre_pass_bas = zeros(size(ecg));
+    index_fc1 = ceil((fc1*N)/fe);
+    filtre_pass_bas(1:index_fc1)=1;
+    filtre_pass_bas(N-index_fc1+1:N)=1;
+    
+    %application du filtre
+    ecg_filtre_bas_freq = filtre_pass_bas .*fft(ecg_filtre_temp);
+ 
+    %restitution du signal filtrer
+    ecg_filtre_bas_temp = ifft(ecg_filtre_bas_freq,"symmetric");  
+    
+    %bruit haute frequence
+    bruit_haut = ecg_filtre_int_temp-ecg_filtre_bas_temp; 
+ 
+
+%%    
+    
+% representation 
+
+subplot(4,3,1)
+plot(t,ecg,'linewidth',1)
+xlim([0.5 1.5])
+legend(" signal d'origine")
+xlabel("t");
+ylabel("ecg");
+
+subplot(4,3,2)
+plot(fshift,fftshift(abs(y)));
+legend("spectre du signal d'origine")
+xlabel("f");
+ylabel("A");
+
+subplot(4,3,3)
+
+plot(t,bruit,'linewidth',1);
+legend("bruit bass fréquence")
+xlabel("t");
+ylabel("bruit");
+   
+
+
+subplot(4,3,4)
+plot(t,ecg_filtre_temp,'linewidth',1);
+xlim([0.5 1.5])
+legend("signal filtre")
+xlabel("t");
+ylabel("ecg1");
+    
+
+subplot(4,3,5)
+plot(fshift,fftshift(abs(fft(ecg_filtre_temp))));
+legend("spectre du signal filtrer ecg1")
+xlabel("f");
+ylabel("A");
+
+subplot(4,3,6)
+plot(t,bruit_inter,"Linewidth",1)
+legend("bruit interferance")
+xlabel("t");
+ylabel("Bruit 50Hz");
+    
+
+subplot(4,3,7)
+plot(t,ecg_filtre_int_temp,'linewidth',1);
+legend(" signal filtrer interferance")
+xlim([0.5 1.5])
+xlabel("t");
+ylabel("ecg2");
+    
+
+subplot(4,3,8)
+plot(fshift,fftshift(abs(fft(ecg_filtre_int_temp))));
+legend("spectre du signal filtrer ecg2")
+xlabel("f");
+ylabel("A");
+
+
+subplot(4,3,9)
+plot(t,bruit_haut,'linewidth',1);
+legend("bruit haute Fréquence")
+xlabel("t");
+ylabel("bruit  ");
+    
+
+subplot(4,3,10)
+plot(t,ecg_filtre_bas_temp,'linewidth',1);
+xlim([0.5 1.5])
+legend("signal filtre")
+xlabel("t");
+ylabel("ecg 3");
+    
+
+
+subplot(4,3,11)
+plot(fshift,fftshift(abs(fft(ecg_filtre_bas_temp))));
+legend("spectre du signal filtrer ecg3")
+xlabel("f");
+ylabel("A");
+
+subplot(4,3,12)
+[c,lags] = xcorr(ecg_filtre_bas_temp,ecg_filtre_bas_temp);
+ stem(lags/fe,c)
+
+
+
+
