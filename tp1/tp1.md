@@ -40,18 +40,22 @@ Le code tp1.m est un script Matlab qui simule un signal x et son bruit, puis mon
     '''
     
    Génération du bruit:
-        '''
-      noise = 2*randn(size(x));
-        '''
-    Le signal bruit est généré en utilisant la fonction randn pour générer un signal aléatoire avec une distribution normale centrée sur zéro et une variance de 2. La représentation temporelle du signal bruit est affichée dans le troisième sous-graphique.
+   
+    '''
+    noise = 2*randn(size(x));
+    '''
+    
+   Le signal bruit est généré en utilisant la fonction randn pour générer un signal aléatoire avec une distribution normale centrée sur zéro et une variance de 2. La représentation temporelle du signal bruit est affichée dans le troisième sous-graphique.
 
    Représentation fréquentielle du bruit:
    La représentation fréquentielle du bruit est obtenue en utilisant la FFT et affichée dans le quatrième sous-graphique.
-   '''
-   j = fft(noise);
-   plot(fshift, fftshift(2*abs(j)/N), 'c')
-   grid
+   
     '''
+    j = fft(noise);
+    plot(fshift, fftshift(2*abs(j)/N), 'c')
+    grid
+    '''
+   
 
    Signal x bruité:
     Le signal x bruité est obtenu en ajoutant le signal bruit au signal x. La représentation temporelle du signal x bruité est affichée dans le cinquième sous-graphique.
